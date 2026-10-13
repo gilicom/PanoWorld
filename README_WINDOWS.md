@@ -7,10 +7,10 @@ Windows 11 with an RTX 5080 Laptop GPU (sm_120), which needs CUDA 12.8+ and a so
 
 | Component | Location / version |
 | --- | --- |
-| Python | 3.10.22 (uv-managed), venv at `.venv` |
+| Python | 3.10.22 (uv-managed, installed into `.python/` inside the repo), venv at `.venv` |
 | PyTorch | 2.7.0+cu128, torchvision 0.22.0+cu128, xformers 0.0.30 |
 | Other Python deps | `requirements-windows.txt` (same pins as upstream, minus Linux-only wheels) |
-| gsplat | 1.5.3 (pure-Python wheel; CUDA kernels JIT-compiled for sm_120 on first import) |
+| gsplat | 1.5.3 (pure-Python wheel; CUDA kernels JIT-compiled for sm_120 on first import, cached in `.torch_extensions/`) |
 | CUDA Toolkit | 12.8 at `C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8` |
 | MSVC | Visual Studio 2022 Build Tools, C++ workload |
 | Checkpoints | `model_ckpt/` (LRM 1024x512, LRM 2048x1024, PanoWorld LoRA, Lightning LoRA) |
@@ -31,6 +31,16 @@ The Bash scripts under `scripts/` also work from Git Bash (`scripts/env.sh` was 
 1024x512 LRM fits in 16 GB. Raise it on larger GPUs. The 2048x1024 LRM needs ~19 GB for a single
 view and will not fit on this GPU.
 
+## Recreating the venv
+
+```bat
+uv python install 3.10 --install-dir .python
+uv venv .venv --python .python\cpython-3.10.22-windows-x86_64-none\python.exe
+uv pip install --python .venv\Scripts\python.exe --index-url https://download.pytorch.org/whl/cu128 torch==2.7.0+cu128 torchvision==0.22.0+cu128 xformers==0.0.30
+uv pip install --python .venv\Scripts\python.exe -r requirements-windows.txt
+.venv\Scripts\python.exe scripts\patch_gsplat_windows.py
+```
+
 ## Not set up
 
 - **mmcv / mmdet** (control models for the 2D Generator and full pipeline): the bundled
@@ -43,4 +53,4 @@ view and will not fit on this GPU.
 
 If gsplat is reinstalled, run `scripts\patch_gsplat_windows.py` again (it swaps GCC-only host
 compiler flags for MSVC ones), then delete
-`%LOCALAPPDATA%\torch_extensions\torch_extensions\Cache\py310_cu128\gsplat_cuda` to force a rebuild.
+`.torch_extensions\gsplat_cuda` to force a rebuild.

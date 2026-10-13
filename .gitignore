@@ -29,3 +29,5 @@ panoworld_2d_generator/models/control_models/mmdetection/
 
 # Local datasets
 data/
+.python/
+.torch_extensions/
