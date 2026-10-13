@@ -26,3 +26,6 @@ panoworld_2d_generator/models/control_models/**/*.part
 panoworld_2d_generator/models/control_models/panosamic/
 panoworld_2d_generator/models/control_models/moge/
 panoworld_2d_generator/models/control_models/mmdetection/
+
+# Local datasets
+data/
